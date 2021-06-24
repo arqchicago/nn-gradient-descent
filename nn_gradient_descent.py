@@ -33,6 +33,16 @@ class NNetwork(object):
         for i in range(len(sizes)-1):
             self.weights.append(np.random.randn(sizes[i+1],sizes[i]))
 
+    def get_num_layers(self):
+        return self.num_layers
+        
+    def get_weights(self):
+        return self.weights
+        
+    def get_biases(self):
+        return self.biases
+
+
 
 if __name__ == "__main__":
     
@@ -45,3 +55,10 @@ if __name__ == "__main__":
  
     # setup a network with 2 input layers, 3 hidden layers, 1 output layer
     net = NNetwork([2, 3, 1])
+    num_net_layers = net.get_num_layers()
+    biases_net = net.get_biases()
+    weights_net = net.get_weights()
+    
+    print(f'> number of layers: \n{num_net_layers}\n')
+    print(f'> biases: \n{biases_net}\n')
+    print(f'> weights: \n{weights_net}')
