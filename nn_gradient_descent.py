@@ -58,7 +58,20 @@ if __name__ == "__main__":
     num_net_layers = net.get_num_layers()
     biases_net = net.get_biases()
     weights_net = net.get_weights()
-    
+
+    print(f'> Network #1\n')    
     print(f'> number of layers: \n{num_net_layers}\n')
     print(f'> biases: \n{biases_net}\n')
     print(f'> weights: \n{weights_net}')
+
+
+    # setup a network with 3 input layers, 4 hidden layers, 2 output layer
+    net2 = NNetwork([3, 4, 2])
+    num_net2_layers = net2.get_num_layers()
+    biases_net2 = net2.get_biases()
+    weights_net2 = net2.get_weights()
+
+    print(f'> Network #2\n')   
+    print(f'> number of layers: \n{num_net2_layers}\n')
+    print(f'> biases: \n{biases_net2}\n')
+    print(f'> weights: \n{weights_net2}')
