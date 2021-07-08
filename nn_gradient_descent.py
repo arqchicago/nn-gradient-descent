@@ -42,6 +42,21 @@ class NNetwork(object):
     def get_biases(self):
         return self.biases
 
+    def get_biase_details(self):
+        biase_info = {}
+        layer = 2  #layer 1 is input layer
+
+        for biases in self.biases:
+            layer_id = 'layer_'+str(layer)
+            biase_info[layer_id] = {}
+            neuron = 1
+            for biase in biases:
+                neuron_id = 'neuron_'+str(neuron)
+                biase_info[layer_id][neuron_id] = biase[0]
+                neuron+=1
+            layer+=1
+            
+        return biase_info
 
 
 if __name__ == "__main__":
@@ -53,25 +68,31 @@ if __name__ == "__main__":
     
     test_data = training_data[0:10]
  
-    # setup a network with 2 input layers, 3 hidden layers, 1 output layer
+    # setup a network with 2 input neurons, 3 hidden neurons, 1 output neuron
     net = NNetwork([2, 3, 1])
     num_net_layers = net.get_num_layers()
     biases_net = net.get_biases()
     weights_net = net.get_weights()
+    biases_net_details = net.get_biase_details()
 
-    print(f'> Network #1\n')    
+    print('') 
+    print(f'> Network #1')    
     print(f'> number of layers: \n{num_net_layers}\n')
     print(f'> biases: \n{biases_net}\n')
+    print(f'> biases (details): \n{biases_net_details}')
     print(f'> weights: \n{weights_net}')
 
 
-    # setup a network with 3 input layers, 4 hidden layers, 2 output layer
-    net2 = NNetwork([3, 4, 2])
+    # setup a network with 3 input neurons, 2 hidden layers with 4 neurons each, 2 output neurons
+    net2 = NNetwork([3, 4, 4, 2])
     num_net2_layers = net2.get_num_layers()
     biases_net2 = net2.get_biases()
     weights_net2 = net2.get_weights()
+    biases_net2_details = net2.get_biase_details()
 
+    print('') 
     print(f'> Network #2\n')   
     print(f'> number of layers: \n{num_net2_layers}\n')
     print(f'> biases: \n{biases_net2}\n')
+    print(f'> biases (details): \n{biases_net2_details}')
     print(f'> weights: \n{weights_net2}')
