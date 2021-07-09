@@ -33,16 +33,50 @@ class NNetwork(object):
         for i in range(len(sizes)-1):
             self.weights.append(np.random.randn(sizes[i+1],sizes[i]))
 
+
     def get_num_layers(self):
         return self.num_layers
-        
+
+  
     def get_weights(self):
         return self.weights
-        
+
+
+    def get_weight_details(self):
+        # this will return detailed information on the weights of inputs to neurons in the network
+        # e.g. Neuron O(layer 2, neuron 1) -- O(layer 3, neuron 2)  --> layer_2, 
+        weight_info = {}
+        layer = 2  #layer 1 is input layer
+
+        for layer_weights in self.weights:
+            layer_id = 'layer_'+str(layer)
+            weight_info[layer_id] = {}
+            neuron = 1
+
+                
+            for neuron_weights in layer_weights:
+                neuron_id = 'neuron_'+str(neuron)
+                weight_info[layer_id][neuron_id] = {}
+                neuron_prev = 1
+
+                for weight in neuron_weights:
+                    neuron_prev_id = 'neuron__'+str(neuron_prev)
+                    weight_info[layer_id][neuron_id][neuron_prev_id] = weight
+                    neuron_prev += 1
+                    
+                neuron += 1
+            layer+=1
+            
+        return weight_info
+
+
     def get_biases(self):
         return self.biases
 
+
     def get_biase_details(self):
+        # this will return detailed information on biases of neurons in the network
+        # e.g. Neuron O(layer 2, neuron 1) --> biase_info[layer_num][neuron_num] = biase_info[2][1]
         biase_info = {}
         layer = 2  #layer 1 is input layer
 
@@ -74,6 +108,7 @@ if __name__ == "__main__":
     biases_net = net.get_biases()
     weights_net = net.get_weights()
     biases_net_details = net.get_biase_details()
+    weights_net_details = net.get_weight_details()
 
     print('') 
     print(f'> Network #1')    
@@ -81,6 +116,12 @@ if __name__ == "__main__":
     print(f'> biases: \n{biases_net}\n')
     print(f'> biases (details): \n{biases_net_details}')
     print(f'> weights: \n{weights_net}')
+    
+    for layer, neuron_weights in weights_net_details.items():
+        for neuron, weights in neuron_weights.items():
+            for neuron_prev_layer, weight in weights.items():
+                print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  {weight}')
+
 
 
     # setup a network with 3 input neurons, 2 hidden layers with 4 neurons each, 2 output neurons
@@ -89,6 +130,7 @@ if __name__ == "__main__":
     biases_net2 = net2.get_biases()
     weights_net2 = net2.get_weights()
     biases_net2_details = net2.get_biase_details()
+    weights_net2_details = net2.get_weight_details()
 
     print('') 
     print(f'> Network #2\n')   
@@ -96,3 +138,9 @@ if __name__ == "__main__":
     print(f'> biases: \n{biases_net2}\n')
     print(f'> biases (details): \n{biases_net2_details}')
     print(f'> weights: \n{weights_net2}')
+    
+
+    for layer, neuron_weights in weights_net2_details.items():
+        for neuron, weights in neuron_weights.items():
+            for neuron_prev_layer, weight in weights.items():
+                print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  {weight}')
