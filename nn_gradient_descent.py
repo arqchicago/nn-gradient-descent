@@ -15,21 +15,27 @@ class NNetwork(object):
         self.sizes = sizes
         self.biases = []
         self.weights = []
+        self.activations = {}
+
         
-        # biases
-        # for hidden layers and output layer neurons
-        # e.g. if 3 hidden layer, 1 output layer then 
-        #      return [array([[b1], [b2], [b3]]), array([[b4]])]
-        
+        """ 
+        biases
+        for hidden layers and output layer neurons
+        e.g. if 3 hidden layer, 1 output layer then 
+             return [array([[b1], [b2], [b3]]), array([[b4]])]
+        """
+
         for y in sizes[1:]:
             self.biases.append(np.random.randn(y,1))
-            
-        
+
+
+        """
         # weights
         # for hidden layers and output layer neurons (randomly assigned values)
         # e.g. if 2 input layer neurons, 3 hidden layer neurons, 1 output layer neuron then  
         #      return [array([[w1 w2], [w3 w4], [w5 w6]]), array([[w7 w8 w9]])]
-        
+        """
+
         for i in range(len(sizes)-1):
             self.weights.append(np.random.randn(sizes[i+1],sizes[i]))
 
@@ -43,8 +49,11 @@ class NNetwork(object):
 
 
     def get_weight_details(self):
-        # this will return detailed information on the weights of inputs to neurons in the network
-        # e.g. Neuron O(layer 2, neuron 1) -- O(layer 3, neuron 2)  --> layer_2, 
+        """
+        this will return detailed information on the weights of inputs to neurons in the network
+        e.g. Neuron O(layer 2, neuron 1) -- O(layer 3, neuron 2)  --> layer_2, 
+        """
+
         weight_info = {}
         layer = 2  #layer 1 is input layer
 
@@ -75,8 +84,10 @@ class NNetwork(object):
 
 
     def get_biase_details(self):
-        # this will return detailed information on biases of neurons in the network
-        # e.g. Neuron O(layer 2, neuron 1) --> biase_info[layer_num][neuron_num] = biase_info[2][1]
+        """
+        this will return detailed information on biases of neurons in the network
+        e.g. Neuron O(layer 2, neuron 1) --> biase_info[layer_num][neuron_num] = biase_info[2][1]
+        """
         biase_info = {}
         layer = 2  #layer 1 is input layer
 
@@ -91,6 +102,25 @@ class NNetwork(object):
             layer+=1
             
         return biase_info
+
+
+    def feedforward(self, a):
+        """
+        Return the output of the network if a is input.
+        traverse through the neurons of each layer and calculate activations until the output layer neurons
+        z = w*a + b
+        a = 1/(1+exp(-z))
+        output of neurons in one layer is inputs to the neurons in the next layer
+        """
+        
+        layer = 2  #layer 1 is input layer
+        for bias, weight in zip(self.biases, self.weights):
+            layer_id = 'layer_'+str(layer)
+            z = np.dot(weight, a)+bias
+            a = 1.0/(1.0+np.exp(-1*z))
+            self.activations[layer_id] = a
+        return a
+
 
 
 if __name__ == "__main__":
@@ -114,15 +144,26 @@ if __name__ == "__main__":
     print(f'> Network #1')    
     print(f'> number of layers: \n{num_net_layers}\n')
     print(f'> biases: \n{biases_net}\n')
-    print(f'> biases (details): \n{biases_net_details}')
     print(f'> weights: \n{weights_net}')
     
+    # print biases
+    for layer, neuron_biases in biases_net_details.items():
+        for neuron, biase in neuron_biases.items():
+            print(f'layer = {layer}, neuron = {neuron}:  biase = {biase}')
+
+
+    # print weights
     for layer, neuron_weights in weights_net_details.items():
         for neuron, weights in neuron_weights.items():
             for neuron_prev_layer, weight in weights.items():
-                print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  {weight}')
+                print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  weight = {weight}')
 
+    a = np.random.rand(2,1).round(2)
+    output = net.feedforward(a)
+    print(output)
 
+    
+    
 
     # setup a network with 3 input neurons, 2 hidden layers with 4 neurons each, 2 output neurons
     net2 = NNetwork([3, 4, 4, 2])
@@ -139,8 +180,16 @@ if __name__ == "__main__":
     print(f'> biases (details): \n{biases_net2_details}')
     print(f'> weights: \n{weights_net2}')
     
+    # print biases
+    for layer, neuron_biases in biases_net2_details.items():
+        for neuron, biase in neuron_biases.items():
+            print(f'layer = {layer}, neuron = {neuron}:  biase = {biase}')    
 
     for layer, neuron_weights in weights_net2_details.items():
         for neuron, weights in neuron_weights.items():
             for neuron_prev_layer, weight in weights.items():
                 print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  {weight}')
+
+    a = np.random.rand(3,1).round(2)
+    output = net2.feedforward(a)
+    print(output)
