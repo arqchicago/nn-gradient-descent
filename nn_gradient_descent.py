@@ -104,22 +104,37 @@ class NNetwork(object):
         return biase_info
 
 
-    def feedforward(self, a):
+    def feedforward(self, activations):
         """
-        Return the output of the network if a is input.
+        Return the output of the network if activations is input.
         traverse through the neurons of each layer and calculate activations until the output layer neurons
-        z = w*a + b
-        a = 1/(1+exp(-z))
+        z = w*activations + b
+        activations = 1/(1+exp(-z))
         output of neurons in one layer is inputs to the neurons in the next layer
         """
         
         layer = 2  #layer 1 is input layer
         for bias, weight in zip(self.biases, self.weights):
+            z = np.dot(weight, activations)+bias
+            activations = 1.0/(1.0+np.exp(-1*z))
+            
             layer_id = 'layer_'+str(layer)
-            z = np.dot(weight, a)+bias
-            a = 1.0/(1.0+np.exp(-1*z))
-            self.activations[layer_id] = a
-        return a
+            self.activations[layer_id] = {}
+            neuron = 1
+            for activation in activations:
+                neuron_id = 'neuron_'+str(neuron)
+                self.activations[layer_id][neuron_id] = activation[0]
+                neuron += 1
+            layer += 1
+        return activations
+
+
+    def get_activation_details(self):
+        """
+        ???
+        """
+
+        return self.activations
 
 
 
@@ -159,8 +174,16 @@ if __name__ == "__main__":
                 print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  weight = {weight}')
 
     a = np.random.rand(2,1).round(2)
-    output = net.feedforward(a)
-    print(output)
+    net_output = net.feedforward(a)
+    activations = net.get_activation_details()
+
+
+    # print activations
+    for layer, neuron_activations in activations.items():
+        for neuron, activation in neuron_activations.items():
+            print(f'layer = {layer}, neuron = {neuron}:  activation = {activation}')
+
+    print(f'network output = {net_output}')
 
     
     
@@ -191,5 +214,13 @@ if __name__ == "__main__":
                 print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  {weight}')
 
     a = np.random.rand(3,1).round(2)
-    output = net2.feedforward(a)
-    print(output)
+    net2_output = net2.feedforward(a)
+    activations = net2.get_activation_details()
+
+
+    # print activations
+    for layer, neuron_activations in activations.items():
+        for neuron, activation in neuron_activations.items():
+            print(f'layer = {layer}, neuron = {neuron}:  activation = {activation}')
+
+    print(f'network 2 output = {net2_output}')
