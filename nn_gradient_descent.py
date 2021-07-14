@@ -129,23 +129,41 @@ class NNetwork(object):
         return activations
 
 
-    def get_activation_details(self):
+    def stochastic_gradient_descent(self, epochs, batch_size, training_data):
         """
-        ???
+        This method will use backpropagation on mini-batches of size batch_size each to update weights and biases. 
         """
 
+        n = len(training_data)
+        for epoch in range(epochs):
+            random.shuffle(training_data)
+            batches = [training_data[k:k+batch_size] for k in range(0, n, batch_size)]
+        
+            for batch in batches:
+                for x, y in batch:
+                    print(">> (",x,y,")")
+        return batches
+
+    def get_activation_details(self):
+        """
+        Return activations of all neurons in the network.
+        """
         return self.activations
 
 
 
 if __name__ == "__main__":
     
+    epochs = 10
+    batch_size = 5
+    
     # setting up train and test sets
     training_data = []
-    for i in range(0,25):
+    for i in range(0,100):
         training_data.append((round(random.random(), 2), random.randint(0, 1)))
     
     test_data = training_data[0:10]
+    training_data = training_data[10:100]
  
     # setup a network with 2 input neurons, 3 hidden neurons, 1 output neuron
     net = NNetwork([2, 3, 1])
@@ -173,6 +191,10 @@ if __name__ == "__main__":
             for neuron_prev_layer, weight in weights.items():
                 print(f'layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  weight = {weight}')
 
+    batches = net.stochastic_gradient_descent(epochs, batch_size, training_data)
+    
+    print(batches)
+    print(len(batches))
     a = np.random.rand(2,1).round(2)
     net_output = net.feedforward(a)
     activations = net.get_activation_details()
@@ -187,7 +209,7 @@ if __name__ == "__main__":
 
     
     
-
+    '''
     # setup a network with 3 input neurons, 2 hidden layers with 4 neurons each, 2 output neurons
     net2 = NNetwork([3, 4, 4, 2])
     num_net2_layers = net2.get_num_layers()
@@ -224,3 +246,5 @@ if __name__ == "__main__":
             print(f'layer = {layer}, neuron = {neuron}:  activation = {activation}')
 
     print(f'network 2 output = {net2_output}')
+    
+    '''
