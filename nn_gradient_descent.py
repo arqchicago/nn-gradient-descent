@@ -26,7 +26,7 @@ class NNetwork(object):
         """
 
         for y in sizes[1:]:
-            self.biases.append(np.random.randn(y,1))
+            self.biases.append(np.random.randn(y,1).round(2))
 
 
         """
@@ -37,7 +37,7 @@ class NNetwork(object):
         """
 
         for i in range(len(sizes)-1):
-            self.weights.append(np.random.randn(sizes[i+1],sizes[i]))
+            self.weights.append(np.random.randn(sizes[i+1],sizes[i]).round(2))
 
 
     def get_num_layers(self):
@@ -139,9 +139,9 @@ class NNetwork(object):
             random.shuffle(training_data)
             batches = [training_data[k:k+batch_size] for k in range(0, n, batch_size)]
         
-            for batch in batches:
-                for x, y in batch:
-                    print(">> (",x,y,")")
+            #for batch in batches:
+            #    for x, y in batch:
+            #        print(">> (",x,y,")")
         return batches
 
     def get_activation_details(self):
@@ -165,8 +165,8 @@ if __name__ == "__main__":
     test_data = training_data[0:10]
     training_data = training_data[10:100]
  
-    # setup a network with 2 input neurons, 3 hidden neurons, 1 output neuron
-    net = NNetwork([2, 3, 1])
+    # setup a network with 2 input neurons, 3 hidden neurons, 2 output neuron
+    net = NNetwork([2, 3, 2])
     num_net_layers = net.get_num_layers()
     biases_net = net.get_biases()
     weights_net = net.get_weights()
@@ -199,13 +199,15 @@ if __name__ == "__main__":
     net_output = net.feedforward(a)
     activations = net.get_activation_details()
 
-
+    print(f'input = {a}')
+    print(f'network output = {net_output}')
+    
     # print activations
     for layer, neuron_activations in activations.items():
         for neuron, activation in neuron_activations.items():
             print(f'layer = {layer}, neuron = {neuron}:  activation = {activation}')
 
-    print(f'network output = {net_output}')
+
 
     
     
