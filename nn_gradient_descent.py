@@ -104,6 +104,11 @@ class NNetwork(object):
         return biase_info
 
 
+    def sigmoid(self, z):
+        """The sigmoid function."""
+        activation = 1.0/(1.0+np.exp(-1*z))
+        return activation
+
     def feedforward(self, activations):
         """
         Return the output of the network if activations is input.
@@ -116,7 +121,7 @@ class NNetwork(object):
         layer = 2  #layer 1 is input layer
         for bias, weight in zip(self.biases, self.weights):
             z = np.dot(weight, activations)+bias
-            activations = 1.0/(1.0+np.exp(-1*z))
+            activations = self.sigmoid(z)
             
             layer_id = 'layer_'+str(layer)
             self.activations[layer_id] = {}
@@ -164,7 +169,10 @@ if __name__ == "__main__":
     
     test_data = training_data[0:10]
     training_data = training_data[10:100]
- 
+
+
+
+    # NETWORK 1
     # setup a network with 2 input neurons, 3 hidden neurons, 2 output neuron
     net = NNetwork([2, 3, 2])
     num_net_layers = net.get_num_layers()
@@ -193,8 +201,8 @@ if __name__ == "__main__":
 
     batches = net.stochastic_gradient_descent(epochs, batch_size, training_data)
     
-    print(batches)
-    print(len(batches))
+    #print(batches)
+    #print(len(batches))
     a = np.random.rand(2,1).round(2)
     net_output = net.feedforward(a)
     activations = net.get_activation_details()
