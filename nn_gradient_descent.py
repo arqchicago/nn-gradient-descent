@@ -105,9 +105,13 @@ class NNetwork(object):
 
 
     def sigmoid(self, z):
-        """The sigmoid function."""
-        activation = 1.0/(1.0+np.exp(-1*z))
-        return activation
+        """sigmoid function"""
+        return 1.0/(1.0+np.exp(-1*z))
+
+
+    def d_sigmoid(self, z):
+        """derivative of the sigmoid function"""
+        return np.exp(-1*z)/(1.0+np.exp(-1*z))**2
 
     def feedforward(self, activations):
         """
