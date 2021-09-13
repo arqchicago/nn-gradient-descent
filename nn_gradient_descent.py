@@ -18,6 +18,11 @@ class NNetwork(object):
         self.activations = {}
         self.bias_map = {}
         self.weight_map = {}
+        self.output = [0]
+        self.bias_list = []
+        self.weights_list = []
+        self.z_list = []
+        self.activations_list = []
         
         """ 
         biases
@@ -74,10 +79,15 @@ class NNetwork(object):
             
     def print_bias_map(self):
         # print the bias map
+        print('='*50)
+        print('{:<5} {:<12} {:<12} {:>12}'.format(' ', 'layer', 'neuron', 'bias'))
+        print('-'*50)
         for layer, neuron_biases in self.bias_map.items():
-            for neuron, biase in neuron_biases.items():
-                print(f'  - layer = {layer}, neuron = {neuron}:  biase = {biase}')
+            for neuron, bias in neuron_biases.items():
+                print('{:<5} {:<12} {:<12} {:>12}'.format(' ', layer, neuron, bias))
 
+        print('='*50)
+        print()
 
     def update_weight_map(self):
         """
@@ -105,11 +115,17 @@ class NNetwork(object):
             layer+=1
             
     def print_weight_map(self):
+        print('='*70)
+        print('{:<5} {:<12} {:<12} {:>12} {:>12}'.format(' ', 'layer', 'neuron', 'prev neuron', 'weight'))
+        print('-'*70)
+        
         # print weights
         for layer, neuron_weights in self.weight_map.items():
             for neuron, weights in neuron_weights.items():
                 for neuron_prev_layer, weight in weights.items():
-                    print(f'  - layer = {layer}, neuron = {neuron}, prev neuron = {neuron_prev_layer}:  weight = {weight}')
+                    print('{:<5} {:<12} {:<12} {:>12} {:>12}'.format(' ', layer, neuron, neuron_prev_layer, weight))
+        print('='*70)
+        print()
 
     def feedforward(self, activations):
         """
@@ -119,8 +135,12 @@ class NNetwork(object):
         activations = 1/(1+exp(-z))
         output of neurons in one layer is inputs to the neurons in the next layer
         """
+
+        self.activations_list.append(activations)
+        self.z_list.append(activations)
         
         layer = 2  #layer 1 is input layer
+        
         for bias, weight in zip(self.biases, self.weights):
             z = np.dot(weight, activations)+bias
             activations = self.sigmoid(z)
@@ -133,8 +153,57 @@ class NNetwork(object):
                 self.activations[layer_id][neuron_id] = activation[0]
                 neuron += 1
             layer += 1
-        return activations
+            self.z_list.append(z)
+            self.activations_list.append(activations)
+        self.output = activations
         
+    def get_output(self):
+        return self.output
+        
+    def get_zs(self):
+        return self.z_list
+            
+    def print_activations_map(self):
+        print('='*50)
+        print('{:<5} {:<12} {:<12} {:>12}'.format(' ', 'layer', 'neuron', 'activation'))
+        print('-'*50)
+        
+        # print weights
+        for layer, neuron_activations in self.activations.items():
+            for neuron, activation in neuron_activations.items():
+                print('{:<5} {:<12} {:<12} {:>12}'.format(' ', layer, neuron, round(activation, 8)))
+
+        print('='*50)
+        print()
+        
+    def sigmoid(self, z):
+        """sigmoid function"""
+        return 1.0/(1.0+np.exp(-1*z))
+
+    def sigmoid_prime(self, z):
+        """derivative of the sigmoid function"""
+        return np.exp(-1*z)/(1.0+np.exp(-1*z))**2
+
+    def cost_prime(self, output, y):
+        """derivative of the cost function:  output - y """
+        return (output-y)
+
+    def backprop(self, x, y):
+       
+        # feedforward
+        self.feedforward(x)
+        
+        # backward pass
+        # - output error (e_L)
+        #   -- e_L = delta_a Cost (.) sigma_prime(Z_L inputs in layer L) --> dC/dA * dA/dZ  
+        #           (how fast cost C is changing with respect to activation A) * how fast activation A is changing with respect to Z 
+        output_error = self.cost_prime(self.output, y) * self.sigmoid_prime(self.z_list[-1])
+        
+
+        return output_error
+
+
+
 if __name__ == "__main__":
 
     # NETWORK 1
@@ -149,19 +218,28 @@ if __name__ == "__main__":
     print(f'{"-"*90}')   
     print(f'number of layers: \n{num_net_layers}\n')
     print(f'biases \n{biases_net}\n')
-
-    print(f'bias map')    
+  
     net.update_bias_map()
     net.print_bias_map()
-    
-    print(f'weights \n{weights_net}\n')
-
-    print(f'weight map')    
+     
     net.update_weight_map()
     net.print_weight_map()
         
-    a_input = np.random.rand(2,1).round(2)
+    x = np.random.rand(2,1).round(2)
+    y = np.random.rand(2,1).round(2)
     print(f'\ninput')
-    print(a_input)
-    net_output = net.feedforward(a)
+    print(x)
+    #net_output = net.feedforward(x)
+    net_back_prop = net.backprop(x, y)
+    net.print_activations_map()
+    y_pred = net.get_output()
+
+    d_output = np.exp(-1*y_pred)/(1.0+np.exp(-1*y_pred))**2
+    cost_prime = (y_pred-y)
+    print(y_pred)
+    print(y)
+    print(d_output)
+    print(cost_prime)
+    print(net_back_prop)
+    print(cost_prime*d_output)
     
