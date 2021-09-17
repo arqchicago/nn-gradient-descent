@@ -23,7 +23,9 @@ class NNetwork(object):
         self.weights_list = []
         self.z_list = []
         self.activations_list = []
-        
+        self.delta_b = []
+        self.delta_w = []
+
         """ 
         biases
         for hidden layers and output layer neurons
@@ -37,6 +39,8 @@ class NNetwork(object):
         for y in sizes[1:]:
             self.biases.append(np.random.randn(y,1).round(2))
 
+        self.delta_b = [np.zeros(b.shape) for b in self.biases]
+        
         """
         # weights
         # for hidden layers and output layer neurons (randomly assigned values)
@@ -50,6 +54,8 @@ class NNetwork(object):
 
         for i in range(len(sizes)-1):
             self.weights.append(np.random.randn(sizes[i+1],sizes[i]).round(2))
+        
+        self.delta_w = [np.zeros(w.shape) for w in self.weights] 
 
     def get_num_layers(self):
         return self.num_layers
@@ -65,7 +71,7 @@ class NNetwork(object):
         this will return detailed information on biases of neurons in the network
         e.g. Neuron O(layer 2, neuron 1) --> biase_info[layer_num][neuron_num] = biase_info[2][1]
         """
-        layer = 2  #layer 1 is input layer
+        layer = 1  #layer 0 is input layer
 
         for biases in self.biases:
             layer_id = 'layer_'+str(layer)
@@ -95,7 +101,7 @@ class NNetwork(object):
         e.g. Neuron O(layer 2, neuron 1) -- O(layer 3, neuron 2)  --> layer_2, 
         """
 
-        layer = 2  #layer 1 is input layer
+        layer = 1  #layer 0 is input layer
 
         for layer_weights in self.weights:
             layer_id = 'layer_'+str(layer)
@@ -136,10 +142,10 @@ class NNetwork(object):
         output of neurons in one layer is inputs to the neurons in the next layer
         """
 
-        self.activations_list.append(activations)
-        self.z_list.append(activations)
+        self.activations_list.append(activations)  #input is 0 layer
+        self.z_list.append(activations)  #input is 0 layer
         
-        layer = 2  #layer 1 is input layer
+        layer = 1  #layer 0 is input layer
         
         for bias, weight in zip(self.biases, self.weights):
             z = np.dot(weight, activations)+bias
@@ -181,26 +187,57 @@ class NNetwork(object):
         return 1.0/(1.0+np.exp(-1*z))
 
     def sigmoid_prime(self, z):
-        """derivative of the sigmoid function"""
+        """
+        derivative of the sigmoid function
+        if a = 1/(1+e^(-z))
+           da/dz = -1*(-e^(-z))/(1+e^(-z))^2
+                 = e^(-z)/(1+e^(-z))^2
+        """
         return np.exp(-1*z)/(1.0+np.exp(-1*z))**2
 
-    def cost_prime(self, output, y):
-        """derivative of the cost function:  output - y """
-        return (output-y)
+    def cost_prime(self, A, y):
+        """
+        Cost = 1/2 * (y - y_pred)^2
+        Cost = 1/2 * (y-A)^2 
+        dC/dA = 2/2*(y-A)*(-1) = A-y
+        """
+        
+        return (A-y)
 
     def backprop(self, x, y):
-       
+      
         # feedforward
+        #--------------
         self.feedforward(x)
-        
+
+
         # backward pass
-        # - output error (e_L)
-        #   -- e_L = delta_a Cost (.) sigma_prime(Z_L inputs in layer L) --> dC/dA * dA/dZ  
-        #           (how fast cost C is changing with respect to activation A) * how fast activation A is changing with respect to Z 
+        #--------------
+
+        # 1. output error (e_L)
+        #    e_L = delta_a Cost (.) sigma_prime(Z_L inputs in layer L) --> dC/dA * dA/dZ,  (.) is the hadamard product  
+        #         (how fast cost C is changing with respect to activation A) * how fast activation A is changing with respect to Z 
+
         output_error = self.cost_prime(self.output, y) * self.sigmoid_prime(self.z_list[-1])
         
-
-        return output_error
+        # 2. Cost relative to bias (dC/dB in layer L = e_L)
+        #    dC/dB = dC/dA * dA/dZ * dZ/dB = (e_L) * dZ/dB
+        #    Z = W(jk,l).A(k,l-1) + B(j,l) = W.A+B
+        #    dZ/dB = 1
+        #    dC/dB = (e_L) * dZ/dB = e_L
+        
+        self.delta_b[-1] = output_error
+        
+        # 3. Cost relative to weights (dC/dW in layer L = e_L)
+        #    dC/dW = dC/dA * dA/dZ * dZ/dW = (e_L) * dZ/dW
+        #    Z = W(jk,l).A(k,l-1) + B(j,l) = W.A+B
+        #    dZ/dW = A(k,l-1)
+        #    dC/dW = (e_L) * dZ/dW = e_L * A(k,l-1)     
+ 
+        self.delta_w[-1] = np.dot(output_error, self.activations_list[-2].transpose())   
+        
+        
+        return output_error, self.delta_b[-1], self.delta_w[-1]
 
 
 
@@ -227,19 +264,9 @@ if __name__ == "__main__":
         
     x = np.random.rand(2,1).round(2)
     y = np.random.rand(2,1).round(2)
-    print(f'\ninput')
-    print(x)
-    #net_output = net.feedforward(x)
+
     net_back_prop = net.backprop(x, y)
     net.print_activations_map()
-    y_pred = net.get_output()
 
-    d_output = np.exp(-1*y_pred)/(1.0+np.exp(-1*y_pred))**2
-    cost_prime = (y_pred-y)
-    print(y_pred)
-    print(y)
-    print(d_output)
-    print(cost_prime)
-    print(net_back_prop)
-    print(cost_prime*d_output)
+    print(f'(1) output error e_L:\n {net_back_prop}\n')
     
