@@ -232,7 +232,7 @@ class NNetwork(object):
         #    dC/dW = dC/dA * dA/dZ * dZ/dW = (e_L) * dZ/dW
         #    Z = W(jk,l).A(k,l-1) + B(j,l) = W.A+B
         #    dZ/dW = A(k,l-1)
-        #    dC/dW = (e_L) * dZ/dW = e_L * A(k,l-1)     
+        #    dC/dW = (e_L) * dZ/dW = e_L * A(k,l-1) note: activations in layer l-1 is stored in activations_list[-2]
  
         self.delta_w[-1] = np.dot(output_error, self.activations_list[-2].transpose())   
         
