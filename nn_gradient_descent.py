@@ -239,7 +239,9 @@ class NNetwork(object):
         # 4. Error in layer l in terms of error in layer l+1 (e_l)
         #    dC/dZ_l = dC/dZ_(l+1) * dZ_(l+1)/dZ_1 = dZ_(l+1)/dZ_1 * dC/dZ_(l+1) = dZ_(l+1)/dZ_1 * e_(l+1)
         #    Z_(l+1) = W_(l+1) * A_l + B_(l+1) = W_(l+1) * sigmoid(Z_l) + B_(l+1)
-        #    dZ_(l+1)/dZ_1 = W_(l+1) * d[sigmoid(Z_l)]/dZ_l  
+        #    dZ_(l+1)/dZ_1 = W_(l+1) * d[sigmoid(Z_l)]/dZ_l
+        #    dC/dZ_l = W_(l+1) * d[sigmoid(Z_l)]/dZ_l * e_(l+1)
+        #    dC/dZ_l = W_(l+1) * e_(l+1) * d[sigmoid(Z_l)]/dZ_l
         
         
         return output_error, self.delta_b[-1], self.delta_w[-1]
