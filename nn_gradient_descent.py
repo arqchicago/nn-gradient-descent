@@ -204,8 +204,8 @@ class NNetwork(object):
         
         return (A-y)
 
-    def backprop(self, x, y):
-      
+    def backprop(self, x, y): 
+        
         # feedforward
         #--------------
         self.feedforward(x)
@@ -218,7 +218,7 @@ class NNetwork(object):
         #    e_L = delta_a Cost (.) sigma_prime(Z_L inputs in layer L) --> dC/dZ = dC/dA * dA/dZ,  (.) is the hadamard product  
         #         (how fast cost C is changing with respect to activation A) * how fast activation A is changing with respect to Z 
 
-        output_error = self.cost_prime(self.output, y) * self.sigmoid_prime(self.z_list[-1])
+        error = self.cost_prime(self.output, y) * self.sigmoid_prime(self.z_list[-1])
         
         # 2. Cost relative to bias (dC/dB in layer L = e_L)
         #    dC/dB = dC/dA * dA/dZ * dZ/dB = (e_L) * dZ/dB
@@ -226,7 +226,7 @@ class NNetwork(object):
         #    dZ/dB = 1
         #    dC/dB = (e_L) * dZ/dB = e_L
         
-        self.delta_b[-1] = output_error
+        self.delta_b[-1] = error
         
         # 3. Cost relative to weights (dC/dW in layer L = e_L)
         #    dC/dW = dC/dA * dA/dZ * dZ/dW = (e_L) * dZ/dW
@@ -234,7 +234,7 @@ class NNetwork(object):
         #    dZ/dW = A(k,l-1)
         #    dC/dW = (e_L) * dZ/dW = e_L * A(k,l-1) note: activations in layer l-1 is stored in activations_list[-2]
  
-        self.delta_w[-1] = np.dot(output_error, self.activations_list[-2].transpose())
+        self.delta_w[-1] = np.dot(error, self.activations_list[-2].transpose())
         
         # 4. Error in layer l in terms of error in layer l+1 (e_l)
         #    dC/dZ_(l) = dC/dZ_(l+1) * dZ_(l+1)/dZ_(l) = dZ_(l+1)/dZ_(l) * dC/dZ_(l+1) = dZ_(l+1)/dZ_(l) * e_(l+1)
@@ -242,9 +242,13 @@ class NNetwork(object):
         #    dZ_(l+1)/dZ_(l) = W_(l+1) * d[sigmoid(Z_l)]/dZ_(l)
         #    dC/dZ_(l) = W_(l+1) * d[sigmoid(Z_(l))]/dZ_(l) * e_(l+1)
         #    dC/dZ_(l) = W_(l+1) * e_(l+1) * d[sigmoid(Z_(l))]/dZ_(l)
+        for layer in range(2,self.num_layers):
+            error = np.dot(self.weights[-1*layer+1].transpose(), error) * self.sigmoid_prime(self.z_list[-1*layer])
+            self.delta_b[-1*layer] = error
+            self.delta_w[-1*layer] = np.dot(error, self.activations_list[-1*layer-1].transpose())
         
         
-        return output_error, self.delta_b[-1], self.delta_w[-1]
+        return {'delta_b': self.delta_b, 'delta_w': self.delta_w}
 
 
 
@@ -275,5 +279,8 @@ if __name__ == "__main__":
     net_back_prop = net.backprop(x, y)
     net.print_activations_map()
 
-    print(f'(1) output error e_L:\n {net_back_prop}\n')
+    print(f'Backwards Pass:')
+    for key, val in net_back_prop.items():
+        print(key)
+        print(val)
     
