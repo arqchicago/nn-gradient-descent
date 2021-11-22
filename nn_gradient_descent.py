@@ -2,6 +2,7 @@
 """
 
 """
+import tensorflow as tf
 import random
 import numpy as np
 np.random.seed(1234)
@@ -254,6 +255,13 @@ class NNetwork(object):
 
 if __name__ == "__main__":
 
+    # loading mnist data set
+    # - training_set is a tuple (60000 images, 60000 labels)
+    # - testing_set is a tuple (10000 images, 10000 labels)
+    training_set, testing_set = tf.keras.datasets.mnist.load_data(path="mnist.npz") 
+    print(f'training set (x): {len(training_set[0])}  training set (y): {len(training_set[1])}')
+    print(f'testing set (x): {len(testing_set[0])}    testing set (y): {len(testing_set[1])}')
+    
     # NETWORK 1
     # setup a network with 2 input neurons, 3 hidden neurons, 2 output neuron
     net = NNetwork([2, 3, 2])
