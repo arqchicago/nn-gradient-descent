@@ -13,8 +13,8 @@ class mnist:
         # - training_set is a tuple (60000 images, 60000 labels)
         # - testing_set is a tuple (10000 images, 10000 labels)
         self.training_set, self.testing_set = tf.keras.datasets.mnist.load_data(path="mnist.npz")
-        print(f'training set (x): {len(self.training_set[0])}  training set (y): {len(self.training_set[1])}')
-        print(f'testing set (x): {len(self.testing_set[0])}    testing set (y): {len(self.testing_set[1])}')
+        #print(f'training set (x): {len(self.training_set[0])}  training set (y): {len(self.training_set[1])}')
+        #print(f'testing set (x): {len(self.testing_set[0])}    testing set (y): {len(self.testing_set[1])}')
 
     def get_raw_datasets(self):
         return self.training_set, self.testing_set

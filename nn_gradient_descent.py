@@ -255,12 +255,19 @@ class NNetwork(object):
 
 
 if __name__ == "__main__":
-
+    epochs = 1
+    batch_size = 500
+    
     # loading mnist data set
     mnist_data = mnist()
     training_data, testing_data = mnist_data.get_vectorized_datasets()
-    print(f'training set (x): {len(training_data[0])}  training set (y): {len(training_data[1])}')
-    print(f'testing set (x): {len(testing_data[0])}    testing set (y): {len(testing_data[1])}')
+    print(f'training set: {len(training_data)}  testing set: {len(testing_data)}')
+
+    # this will create mini batches for neural network training
+    for i in range(epochs):
+        mini_batches = []
+        random.shuffle(training_data)
+        mini_batches = [training_data[j:j+batch_size] for j in range(0,len(training_data),batch_size)]
 
     # NETWORK 1
     # setup a network with 2 input neurons, 3 hidden neurons, 2 output neuron
