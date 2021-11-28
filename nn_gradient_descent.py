@@ -257,11 +257,12 @@ class NNetwork(object):
 if __name__ == "__main__":
     epochs = 1
     batch_size = 500
+    val_data = 0.20
     
     # loading mnist data set
     mnist_data = mnist()
-    training_data, testing_data = mnist_data.get_vectorized_datasets()
-    print(f'training set: {len(training_data)}  testing set: {len(testing_data)}')
+    training_data, testing_data, validation_data = mnist_data.get_vectorized_datasets(val_data)
+    print(f'training set: {len(training_data)}  testing set: {len(testing_data)}  validation set: {len(validation_data)}')
 
     # this will create mini batches for neural network training
     for i in range(epochs):
