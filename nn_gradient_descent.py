@@ -248,27 +248,31 @@ class NNetwork(object):
             error = np.dot(self.weights[-1*layer+1].transpose(), error) * self.sigmoid_prime(self.z_list[-1*layer])
             self.delta_b[-1*layer] = error
             self.delta_w[-1*layer] = np.dot(error, self.activations_list[-1*layer-1].transpose())
-        
-        
+                
         return {'delta_b': self.delta_b, 'delta_w': self.delta_w}
 
+    def stochastic_gradient_descent(self, training_data, learning_rate): 
+        # this will create mini batches for neural network training
+        for i in range(epochs):
+            mini_batches = []
+            random.shuffle(training_data)
+            mini_batches = [training_data[j:j+batch_size] for j in range(0,len(training_data),batch_size)]
 
 
 if __name__ == "__main__":
     epochs = 1
     batch_size = 500
     val_data = 0.20
+    learning_rate = 2.5
     
     # loading mnist data set
     mnist_data = mnist()
     training_data, testing_data, validation_data = mnist_data.get_vectorized_datasets(val_data)
-    print(f'training set: {len(training_data)}  testing set: {len(testing_data)}  validation set: {len(validation_data)}')
-
-    # this will create mini batches for neural network training
-    for i in range(epochs):
-        mini_batches = []
-        random.shuffle(training_data)
-        mini_batches = [training_data[j:j+batch_size] for j in range(0,len(training_data),batch_size)]
+    
+    if val_data > 0.0:
+        print(f'training set: {len(training_data)}  testing set: {len(testing_data)}  validation set: {len(validation_data)}')
+    else:
+        print(f'training set: {len(training_data)}  testing set: {len(testing_data)}  validation set: NONE')
 
     # NETWORK 1
     # setup a network with 2 input neurons, 3 hidden neurons, 2 output neuron
@@ -282,7 +286,9 @@ if __name__ == "__main__":
     print(f'{"-"*90}')   
     print(f'number of layers: \n{num_net_layers}\n')
     print(f'biases \n{biases_net}\n')
-  
+
+    net.stochastic_gradient_descent(training_data, learning_rate)
+
     net.update_bias_map()
     net.print_bias_map()
      
