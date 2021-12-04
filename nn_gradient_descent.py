@@ -251,12 +251,23 @@ class NNetwork(object):
                 
         return {'delta_b': self.delta_b, 'delta_w': self.delta_w}
 
+    def update_mini_batch(self, mini_batch, learning_rate):
+        # this will update networks weights and biases by applying the gradient descent algorithm using backprop method
+        delta_b = [np.zeros(b.shape) for b in self.biases]
+        delta_w = [np.zeros(w.shape) for w in self.weights]
+        
+        # TODO
+        
     def stochastic_gradient_descent(self, training_data, learning_rate): 
         # this will create mini batches for neural network training
         for i in range(epochs):
             mini_batches = []
             random.shuffle(training_data)
             mini_batches = [training_data[j:j+batch_size] for j in range(0,len(training_data),batch_size)]
+
+            # for each mini_batch, update weights and biases of the network
+            for mini_batch in mini_batches:
+                self.update_mini_batch(mini_batch, learning_rate)
 
 
 if __name__ == "__main__":
