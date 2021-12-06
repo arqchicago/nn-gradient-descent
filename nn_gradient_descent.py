@@ -257,6 +257,8 @@ class NNetwork(object):
         delta_w = [np.zeros(w.shape) for w in self.weights]
         
         # TODO
+        print(delta_b)
+        print(delta_w)
         
     def stochastic_gradient_descent(self, training_data, learning_rate): 
         # this will create mini batches for neural network training
