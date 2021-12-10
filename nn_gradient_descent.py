@@ -259,7 +259,7 @@ class NNetwork(object):
         # TODO
         for x, y in mini_batch:
             print(">>", x.shape, y.shape)  # error here
-            delta_delta_biase, delta_delta_weight = self.backprop(x, y)
+        #    delta_delta_biase, delta_delta_weight = self.backprop(x, y)
         
     def stochastic_gradient_descent(self, training_data, learning_rate): 
         # this will create mini batches for neural network training
